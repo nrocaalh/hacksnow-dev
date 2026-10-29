@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="page_title">Hacker House · Snow Edition · Dec 2026</title>
+  <meta name="description" content="A hacker house in the mountains for one winter. Engineers, founders and makers: code by the fire, ski by day, ship by night.">
+  <meta property="og:title" content="Hacker House · Snow Edition">
+  <meta property="og:description" content="A hacker house in the mountains for one winter. Engineers, founders and makers: code by the fire, ski by day, ship by night.">
+  <meta property="og:url" content="https://hacksnow.dev/">
+  <meta property="og:image" content="https://hacksnow.dev/assets/poster-hero.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hacker House · Snow Edition">
+  <meta name="twitter:description" content="A hacker house in the mountains for one winter. Engineers, founders and makers: code by the fire, ski by day, ship by night.">
+  <meta name="twitter:image" content="https://hacksnow.dev/assets/poster-hero.jpg">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <noscript><style>.intro { display: none !important; }</style></noscript>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛷</text></svg>">
+</head>
+<body>
+  <canvas id="snow" aria-hidden="true"></canvas>
+
+  <!-- ============ THE ENVELOPE: a letter opens on first load ============ -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="envelope">
+      <div class="env-back"></div>
+      <div class="env-letter">
+        <span class="env-ornament" aria-hidden="true"></span>
+        <span class="env-kicker" data-i18n="invite">You’re invited to join</span>
+        <strong class="env-title">Hacker House</strong>
+        <em class="env-edition" data-i18n="edition">Snow Edition</em>
+      </div>
+      <div class="env-front"></div>
+      <div class="env-flap"></div>
+      <div class="env-seal" aria-hidden="true">
+        <svg class="wax" viewBox="0 0 100 100" role="presentation" focusable="false">
+          <defs>
+            <radialGradient id="waxFace" gradientUnits="userSpaceOnUse" cx="36" cy="30" r="78">
+              <stop offset="0" stop-color="#cf8263"/>
+              <stop offset=".34" stop-color="#b36045"/>
+              <stop offset=".68" stop-color="#93432c"/>
+              <stop offset="1" stop-color="#6d2919"/>
+            </radialGradient>
+            <radialGradient id="waxSheen" gradientUnits="userSpaceOnUse" cx="37" cy="30" r="40">
+              <stop offset="0" stop-color="#ffe9d4" stop-opacity=".42"/>
+              <stop offset=".45" stop-color="#ffe9d4" stop-opacity=".12"/>
+              <stop offset="1" stop-color="#ffe9d4" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="waxRough" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency=".06" numOctaves="2" seed="9" result="n"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <filter id="waxShadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="2.8" stdDeviation="2.2" flood-color="#1c0a05" flood-opacity=".42"/>
+            </filter>
+          </defs>
+          <g filter="url(#waxShadow)">
+            <path filter="url(#waxRough)" fill="url(#waxFace)" d="M95.46 50.00 C95.54 53.08 94.62 56.31 93.76 59.30 C92.90 62.29 91.59 65.13 90.31 67.95 C89.03 70.77 87.86 73.71 86.09 76.22 C84.33 78.73 82.13 81.13 79.71 83.00 C77.30 84.87 74.23 85.73 71.62 87.45 C69.02 89.17 66.84 91.63 64.07 93.32 C61.30 95.00 58.17 96.92 55.00 97.53 C51.83 98.15 48.39 97.26 45.06 97.03 C41.73 96.79 37.91 97.52 35.01 96.12 C32.12 94.73 30.16 90.81 27.69 88.64 C25.22 86.48 22.63 85.08 20.17 83.13 C17.71 81.18 14.83 79.40 12.93 76.93 C11.03 74.47 9.56 71.37 8.76 68.36 C7.97 65.35 8.20 61.96 8.15 58.90 C8.10 55.84 8.37 52.95 8.46 50.00 C8.54 47.05 8.27 44.12 8.66 41.21 C9.06 38.31 9.66 35.25 10.83 32.56 C12.01 29.87 13.93 27.46 15.71 25.08 C17.48 22.71 19.48 20.61 21.48 18.32 C23.48 16.04 25.32 13.41 27.70 11.37 C30.08 9.34 32.81 7.18 35.74 6.11 C38.67 5.05 42.13 4.86 45.27 4.97 C48.40 5.08 51.54 6.10 54.54 6.79 C57.54 7.49 60.43 8.17 63.28 9.13 C66.13 10.08 69.12 10.97 71.64 12.52 C74.16 14.08 76.45 16.25 78.39 18.47 C80.34 20.68 81.67 23.38 83.31 25.80 C84.96 28.21 86.59 30.47 88.24 32.97 C89.90 35.47 92.05 37.97 93.25 40.81 C94.45 43.65 95.37 46.92 95.46 50.00 Z"/>
+            <ellipse cx="39" cy="32" rx="22" ry="15" fill="url(#waxSheen)"/>
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#f4dcc2" stroke-opacity=".26" stroke-width="1.1"/>
+            <circle cx="50" cy="50" r="38.5" fill="none" stroke="#5c2114" stroke-opacity=".38" stroke-width="1"/>
+            <text x="50.7" y="61.7" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="29" font-weight="700" letter-spacing=".5" fill="#5c1e11" opacity=".6">HS</text>
+            <text x="50" y="60.7" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="29" font-weight="700" letter-spacing=".5" fill="#f6e4cd">HS</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <p class="env-hint" data-i18n="click_hint">Click to open</p>
+  </div>
+
+  <div class="sheet">
+    <!-- ============ BAND 1 · HEADER: language switch ============ -->
+    <header class="band band-head">
+      <nav class="lang" role="group" aria-label="Language">
+        <button type="button" class="lang-btn lang-active" data-lang="en">EN</button>
+        <span class="lang-sep">/</span>
+        <button type="button" class="lang-btn" data-lang="es">ES</button>
+      </nav>
+    </header>
+
+    <!-- ============ BAND 2 · TITLE: invitation + two lines ============ -->
+    <div class="band band-title">
+      <p class="invite" data-i18n="invite">You’re invited to join</p>
+      <h1>
+        <span class="t-line">Hacker House</span>
+        <span class="t-line edition" data-i18n="edition">Snow Edition</span>
+      </h1>
+    </div>
+
+    <!-- ============ BAND 3 · THE PRINT: centred and large ============ -->
+    <div class="band band-photo">
+      <figure class="hero">
+        <img src="assets/poster-hero.jpg"
+             alt="A skier in a red jacket typing on the roof of a classic Porsche among alpine peaks, a red cable car crossing the sky"
+             loading="eager">
+      </figure>
+    </div>
+
+    <!-- ============ BAND 4 · THE PROGRAMME: four panelled cells ============ -->
+    <div class="band band-programme">
+      <ul class="programme">
+        <li class="cell">
+          <h3>Hackathon</h3>
+          <p data-i18n="cell_hack_p">Bring an idea. Leave with something built. Teams and demos.</p>
+        </li>
+        <li class="cell">
+          <h3 data-i18n="cell_ski_h3">Ski &amp; Snowboard</h3>
+          <p data-i18n="cell_ski_p">Beginner to expert. Groomed pistes or pure après. All levels.</p>
+        </li>
+        <li class="cell">
+          <h3 data-i18n="cell_comm_h3">Community</h3>
+          <p data-i18n="cell_comm_p">People who build things. Share ideas and feedback with other builders.</p>
+        </li>
+        <li class="cell">
+          <h3 data-i18n="cell_sponsor_h3">Sponsors</h3>
+          <p><span data-i18n="cell_sponsor_p">Pending. For more information, contact </span><a class="mail-link" href="mailto:contact@hacksnow.dev?subject=Sponsors%20%E2%80%94%20Hacker%20House">contact@hacksnow.dev</a>.</p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ============ BAND 5 · FOOT: the Join CTA, nothing else ============ -->
+    <footer class="band band-foot">
+      <div class="foot-form">
+        <p class="dates-note"><span class="dn-rule" aria-hidden="true"></span><span data-i18n="date_pending">Dates · pending</span><span class="dn-rule" aria-hidden="true"></span></p>
+        <button type="button" id="join-btn" class="join-cta" data-i18n="cta">Join the Hacker Snow</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============ THE APPLICATION FORM ============ -->
+  <div class="modal" id="join-modal" hidden>
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="form-title">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Close">×</button>
+
+      <form id="waitlist-form" novalidate>
+        <input type="text" id="f-hp" name="hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <h2 id="form-title" data-i18n="form_title">Application · Snow Edition</h2>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="label" data-i18n="l_name">Full name</span>
+            <input type="text" id="f-name" autocomplete="name" required maxlength="80">
+          </label>
+          <label class="field field-sm">
+            <span class="label" data-i18n="l_age">Age</span>
+            <input type="number" id="f-age" min="18" max="99" required>
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="label" data-i18n="l_email">Email</span>
+          <input type="email" id="f-email" autocomplete="email" required>
+        </label>
+
+        <fieldset class="field">
+          <legend class="label" data-i18n="l_role">Role / profile</legend>
+          <div class="chip-grid" id="f-role">
+            <label class="chip"><input type="radio" name="role" value="engineer" required>
+              <span data-i18n="role1">Engineer</span></label>
+            <label class="chip"><input type="radio" name="role" value="founder">
+              <span data-i18n="role2">Founder</span></label>
+            <label class="chip"><input type="radio" name="role" value="designer">
+              <span data-i18n="role3">Designer</span></label>
+            <label class="chip"><input type="radio" name="role" value="data-ai">
+              <span>Data / AI</span></label>
+            <label class="chip"><input type="radio" name="role" value="student">
+              <span data-i18n="role4">Student</span></label>
+            <label class="chip"><input type="radio" name="role" value="other">
+              <span data-i18n="role5">Other</span></label>
+          </div>
+          <input type="text" id="f-role-other" class="role-other" maxlength="60" hidden>
+        </fieldset>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="label">GitHub <i class="opt" data-i18n="opt">optional</i></span>
+            <input type="text" id="f-gh" autocomplete="username" maxlength="39">
+          </label>
+          <label class="field">
+            <span class="label">X / Twitter <i class="opt" data-i18n="opt">optional</i></span>
+            <input type="text" id="f-x" autocomplete="username" maxlength="15">
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="label">Web / LinkedIn <i class="opt" data-i18n="opt">optional</i></span>
+          <input type="url" id="f-web" autocomplete="url" maxlength="200">
+        </label>
+
+        <fieldset class="field">
+          <legend class="label" data-i18n="l_ski">Ski &amp; Snowboard</legend>
+          <div class="radio-grid" id="f-ski">
+            <label class="radio"><input type="radio" name="ski" value="beginner" required>
+              <span><b data-i18n="ski1_b">Beginner</b><i data-i18n="ski1_i">Need classes, first turns</i></span></label>
+            <label class="radio"><input type="radio" name="ski" value="intermediate">
+              <span><b data-i18n="ski2_b">Intermediate</b><i data-i18n="ski2_i">Green, blue and some red runs</i></span></label>
+            <label class="radio"><input type="radio" name="ski" value="advanced">
+              <span><b data-i18n="ski3_b">Advanced</b><i data-i18n="ski3_i">All runs, including some blacks</i></span></label>
+            <label class="radio"><input type="radio" name="ski" value="expert">
+              <span><b data-i18n="ski4_b">Expert</b><i data-i18n="ski4_i">Guides us. Classes inverted</i></span></label>
+            <label class="radio radio-wide"><input type="radio" name="ski" value="none">
+              <span><b data-i18n="ski5_b">No skiing</b><i data-i18n="ski5_i">Here for the code and the snow</i></span></label>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span class="label" data-i18n="l_project">Tell us what you are building these days</span>
+          <textarea id="f-project" rows="2" maxlength="500" required></textarea>
+        </label>
+
+        <label class="field rgpd">
+          <input type="checkbox" id="f-rgpd" required>
+          <span><span data-i18n="rgpd_pre">I consent to the processing of my data to evaluate this application (GDPR). We keep it only for Hacker House: no sharing, no marketing lists. </span><a href="#" id="privacy-link" data-i18n="privacy_link">Privacy notice</a><span data-i18n="rgpd_post"> · You can request deletion at any time.</span></span>
+        </label>
+        <div class="privacy-note" id="privacy-note" hidden>
+          <p><b data-i18n="priv_b">Privacy notice (Art. 13 GDPR).</b> <span data-i18n="priv_rest">Controller: Hacker House, Snow Edition. Purpose: evaluating your application and organising the stay. Data: name, age, email, role, GitHub and X handles (optional), web or LinkedIn (optional), ski level, project description. Legal basis: consent. Retention: until the edition ends, or upon your withdrawal. Rights: access, rectification, erasure, objection: write us at contact@hacksnow.dev. Your data is never sold or shared for marketing; only the providers needed to run it process it (Cloudflare for hosting and database, Resend for sending emails).</span></p>
+        </div>
+
+        <p class="msg" id="form-msg" role="status" aria-live="polite"></p>
+        <button type="submit" class="submit-btn" data-i18n="submit">Submit application</button>
+      </form>
+
+      <div class="success" id="success" hidden>
+        <p class="ok" id="success-title">Thank you</p>
+        <p class="fine" data-i18n="ok_fine">Your application is in. We’ll send you a confirmation email and let you know more details as soon as we have them. See you on the mountain.</p>
+        <svg class="letter-crest" viewBox="0 0 120 120" role="img" aria-label="Hacker House, Snow Edition">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="1"/>
+          <circle cx="60" cy="60" r="47" fill="none" stroke="currentColor" stroke-width=".5" opacity=".55"/>
+          <path d="M60 22 L62.5 27.5 L68 30 L62.5 32.5 L60 38 L57.5 32.5 L52 30 L57.5 27.5 Z" fill="currentColor" opacity=".85"/>
+          <path d="M28 82 L46 56 L56 68 L70 50 L92 82" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M43 60 L46 56 L49 60 M66 55 L70 50 L74 55" fill="none" stroke="currentColor" stroke-width=".8" opacity=".7"/>
+          <path d="M32 90 H88" stroke="currentColor" stroke-width=".8" opacity=".6"/>
+          <path d="M60 87 l3 3 -3 3 -3 -3 z" fill="currentColor" opacity=".85"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

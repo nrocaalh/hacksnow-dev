@@ -1,0 +1,6 @@
+# Copy to .dev.vars for `wrangler pages dev` locally. Real deployments use
+# `wrangler pages secret put RESEND_API_KEY` instead. Never commit .dev.vars.
+RESEND_API_KEY=re_00000000000000000000000000000000000
+MAIL_FROM=Hacker House <contact@hacksnow.dev>
+MAIL_REPLY_TO=contact@hacksnow.dev
+# NOTIFY_EMAIL=you@hacksnow.dev

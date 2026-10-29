@@ -1,0 +1,1091 @@
+/* Hacker House — Snow Edition v2 · "vintage letter sheet"
+   Everything sits inside one big letter-paper sheet with visible
+   stationery texture; outside, a darker desk surface. The sheet is
+   portrait on phones and a touch landscape on desktop.
+   Palette sampled from the (muted) poster hero.
+
+   LAYOUT follows Nuria's hand sketch — five bands:
+   1. header: EN / ES language switch (right)
+   2. title on two lines: HACKER HOUSE / SNOW EDITION
+   3. the framed print, CENTRED and large (as in the earlier version)
+   4. the programme: four panelled cells
+      (Hackathon · Ski & Snow · Tech Community · Sponsors)
+   5. foot: dates + Join CTA, with HACK SNOW / HACK SPAIN pinned
+      to the bottom-left and bottom-right corners
+
+   FIT-TO-VIEWPORT: the whole letter fits the screen with no
+   scrolling, on desktop and mobile alike; on desktop the paper is a
+   wide letter (1.2 : 1). All vertical rhythm uses vh-based clamps
+   so the sheet scales to the window. */
+:root {
+  /* sampled from assets/poster-hero.jpg (muted heritage edition) */
+  --desk: #8d9384;           /* outside: muted sage desk */
+  --paper: #f4ecda;          /* letter paper, warm cream */
+  --paper-deep: #ece1c8;
+  --ink: #2e3a30;            /* pine ink */
+  --pine: #465646;           /* photo pines */
+  --claret: #a6654d;         /* heritage terracotta red — the car */
+  --oxblood: #8a4a36;        /* button — deeper terracotta */
+  --gold: #b3904f;           /* faded brass */
+  --gold-dim: rgba(179, 144, 79, .45);
+  --soft: #7d8071;           /* sage grey (photo sky) */
+  --navy: #33413c;           /* deep pine shadow */
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Jost', system-ui, sans-serif;
+
+  /* one spacing token that scales with the shortest viewport axis:
+     grows on big screens, shrinks on phones and short windows */
+  --fit: clamp(6px, 1.45vh, 20px);
+
+  /* horizontal padding of the paper's bands */
+  --pad: clamp(18px, 5vw, 64px);
+
+  /* the sheet is a portrait letter on narrow screens and turns into a
+     wide, slightly landscape sheet (1.2 : 1) on desktop */
+  --sheet-h: min(860px, calc(100dvh - clamp(20px, 4.8vh, 80px)));
+  --sheet-w: min(calc((100dvw - clamp(16px, 5.2vw, 80px)) * .96),
+                 calc(var(--sheet-h) * .7727));
+
+  --crumple: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900' viewBox='0 0 1400 900' preserveAspectRatio='xMidYMid slice'><filter id='crumple' x='0' y='0' width='100%' height='100%'><feTurbulence type='turbulence' baseFrequency='0.006 0.009' numOctaves='5' seed='9' result='n'/><feDiffuseLighting in='n' lighting-color='%23c6d3b8' surfaceScale='5' diffuseConstant='1.2'><feDistantLight azimuth='225' elevation='42'/></feDiffuseLighting><feComponentTransfer><feFuncA type='linear' slope='.85'/></feComponentTransfer></filter><filter id='grain' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='1400' height='900' filter='url(%23crumple)'/><rect width='1400' height='900' filter='url(%23grain)' opacity='.07'/></svg>");
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+[hidden] { display: none !important; }   /* author display rules must not beat it */
+html { height: 100%; scroll-behavior: smooth; }
+html, body { overflow: hidden; }           /* the page never scrolls */
+body {
+  /* the desk under the letter: sage green, crumpled like a sheet of
+     letter paper — procedural folds + fibre grain, tinted by the desk
+     colour itself and finished with soft vignettes */
+  background:
+    var(--crumple) center / cover no-repeat,
+    radial-gradient(1200px 800px at 50% 20%, rgba(255, 252, 244, .14), transparent 65%),
+    radial-gradient(1400px 1000px at 50% 110%, rgba(46, 58, 48, .38), transparent 70%),
+    radial-gradient(700px 500px at 8% 88%, rgba(46, 58, 48, .18), transparent 70%),
+    var(--desk);
+  background-blend-mode: soft-light, normal, normal, normal, normal;
+  color: var(--ink);
+  font-family: var(--serif);
+  height: 100dvh;                            /* dvh: tracks mobile URL-bar resize */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 2.4vh, 40px) clamp(8px, 2.6vw, 40px);
+  -webkit-font-smoothing: antialiased;
+}
+#snow { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+/* ================= THE ENVELOPE INTRO =================
+   on first load a wax-sealed envelope opens, the invitation rises
+   out of it and the whole scene dissolves onto the letter page. */
+body.intro-lock { overflow: hidden !important; }
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 4;                        /* under the snow canvas */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3.5vh, 32px);
+  padding: 24px;
+  cursor: default;
+  background:
+    linear-gradient(rgba(18, 28, 20, .30), rgba(18, 28, 20, .48)),
+    var(--crumple) center / cover no-repeat,
+    radial-gradient(900px 700px at 50% 45%, rgba(255, 252, 244, .10), transparent 70%),
+    var(--desk);
+  background-blend-mode: normal, soft-light, normal, normal;
+  transition: opacity .65s ease, visibility .65s ease;
+}
+.intro.done { opacity: 0; visibility: hidden; transition: opacity .55s ease .45s, visibility 0s 1s; }
+.intro[hidden] { display: none; }
+.envelope {
+  position: relative;
+  width: min(470px, 82vw, 68vh);
+  aspect-ratio: 1.58;
+  perspective: 1400px;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  transition: transform .65s cubic-bezier(.4, 0, .2, 1), opacity .65s ease;
+  cursor: pointer;
+}
+.intro.done .envelope { transform: translateY(14px) scale(.97); opacity: 0; transition: transform .4s ease, opacity .4s ease; }
+/* idle: the sealed envelope quivers like a startled Pokémon and the
+   paper gleams gold, asking to be opened. All of it stops the moment
+   it opens. */
+.intro:not(.open) .envelope {
+  animation: env-shake 2.2s ease-in-out infinite;
+  transform-origin: 50% 85%;
+  clip-path: inset(0);   /* keep the light sweep inside the paper; lifted on open */
+}
+@keyframes env-shake {
+  0%, 34%, 100% { transform: rotate(0deg) translateX(0); }
+  6%  { transform: rotate(-1.5deg) translateX(-3px); }
+  12% { transform: rotate(1.4deg) translateX(3px); }
+  18% { transform: rotate(-1.1deg) translateX(-2px); }
+  25% { transform: rotate(.9deg) translateX(1.5px); }
+  30% { transform: rotate(-.4deg) translateX(-1px); }
+}
+/* only the paper glows: a tight golden halo breathing on the sheet */
+.intro:not(.open) .env-back { animation: env-glow 2.2s ease-in-out infinite; }
+@keyframes env-glow {
+  0%, 34%, 100% {
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, .25),
+      0 28px 55px rgba(0, 0, 0, .38);
+  }
+  58% {
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, .25),
+      0 28px 55px rgba(0, 0, 0, .38),
+      inset 0 0 26px rgba(232, 196, 118, .35),
+      0 0 16px rgba(232, 196, 118, .35);
+  }
+}
+/* a ribbon of light sweeps across the paper, like a holo card */
+.envelope::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 246, 220, .22) 50%, transparent 58%);
+  transform: translateX(-130%);
+  opacity: 0;
+}
+.intro:not(.open) .envelope::after { animation: env-sheen 2.2s ease-in-out infinite; }
+@keyframes env-sheen {
+  0%, 34% { transform: translateX(-130%); opacity: 0; }
+  42%     { opacity: 1; }
+  72%, 100% { transform: translateX(130%); opacity: 0; }
+}
+.env-back,
+.env-front,
+.env-flap,
+.env-letter { position: absolute; }
+.env-back {
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(160deg, #efe4cc, #e2d4b7);
+  border: 1px solid rgba(70, 86, 70, .35);
+  outline: 1px solid rgba(179, 144, 79, .28);
+  outline-offset: -6px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .25),
+    0 28px 55px rgba(0, 0, 0, .38);
+}
+.env-letter {
+  z-index: 2;
+  left: 7%;
+  right: 7%;
+  top: 11%;
+  bottom: 6%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  background:
+    repeating-linear-gradient(0deg,
+      transparent 0 24px, rgba(70, 86, 70, .06) 24px 25px),
+    linear-gradient(178deg, #f7f0df, #ece1c8);
+  border: 1px solid rgba(70, 86, 70, .3);
+  box-shadow: 0 8px 22px rgba(20, 31, 23, .18);
+  transform: translateY(5%);
+  padding: 12px;
+  will-change: transform;
+  transition: transform 1.7s cubic-bezier(.2, .7, .3, 1) .8s;
+}
+.intro.open .env-letter { transform: translateY(-60%); }
+.env-letter::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(179, 144, 79, .45);
+  pointer-events: none;
+}
+.env-ornament {
+  position: relative;
+  display: block;
+  width: clamp(56px, 16vw, 84px);
+  height: 1px;
+  margin-bottom: 4px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.env-ornament::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  background: var(--gold);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.env-kicker {
+  font-family: var(--sans);
+  font-size: clamp(.52rem, 1.6vw, .64rem);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--pine);
+}
+.env-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.15rem, 4.2vw, 1.7rem);
+  line-height: 1;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.env-edition {
+  font-family: var(--serif);
+  font-size: clamp(.95rem, 3.2vw, 1.35rem);
+  color: var(--claret);
+}
+.env-hint {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: clamp(.56rem, 1.5vw, .68rem);
+  letter-spacing: .32em;
+  text-indent: .32em;
+  text-transform: uppercase;
+  color: rgba(244, 236, 218, .82);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .45);
+  animation: hint-pulse 2.2s ease-in-out infinite;
+}
+@keyframes hint-pulse {
+  0%, 100% { opacity: .95; }
+  50% { opacity: .35; }
+}
+.intro.open .env-hint {
+  animation: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.env-front {
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 252, 244, .3), transparent 42%),
+    linear-gradient(225deg, rgba(70, 86, 70, .07), transparent 45%),
+    linear-gradient(160deg, #eadfc7, #dbcdae);
+  clip-path: polygon(0 0, 50% 44%, 100% 0, 100% 100%, 0 100%);
+  filter: drop-shadow(0 0 1.5px rgba(70, 86, 70, .32));
+  box-shadow:
+    inset 0 9px 14px rgba(70, 86, 70, .05),
+    inset 0 2px 4px rgba(255, 255, 255, .22);
+}
+.env-front::after {
+  content: 'HACKER HOUSE · SNOW EDITION';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 11%;
+  text-align: center;
+  font-family: var(--sans);
+  font-size: clamp(.4rem, 1.1vw, .54rem);
+  letter-spacing: .34em;
+  color: rgba(70, 86, 70, .4);
+}
+.env-flap {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 48%;
+  z-index: 4;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(179, 144, 79, .10) 0 1px, transparent 1px 14px),
+    linear-gradient(180deg, #f1e6cf, #dfd0b1);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  will-change: transform;
+  transition: transform 1.5s cubic-bezier(.5, 0, .15, 1), z-index 0s .8s;
+}
+.intro.open .env-flap { transform: rotateX(-180deg); z-index: 1; }
+/* classic melted-wax seal: rough poured edge, matte red, pressed monogram */
+.env-seal {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  z-index: 5;
+  width: clamp(46px, 10.5vw, 66px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.env-seal .wax {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.intro.open .env-seal {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.7) rotate(-18deg);
+  transition-delay: .1s;
+}
+
+/* ============ THE LETTER SHEET ============
+   one letter that fits the viewport: portrait on narrow screens,
+   slightly landscape (1.2 : 1) on desktop. Its height follows the
+   shorter usable axis of the window. */
+.sheet {
+  position: relative;
+  z-index: 2;
+  width: var(--sheet-w);
+  height: calc(var(--sheet-w) / .7727);   /* portrait letter by default */
+  overflow: hidden;                  /* the print shrinks instead of spilling */
+  margin: 0 auto;
+  transform-origin: center center;   /* set by fit-to-view in app.js */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;    /* the bands spread over the square */
+  background:
+    /* horizontal laid lines, like laid paper */
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 26px,
+      rgba(70, 86, 70, .045) 26px, rgba(70, 86, 70, .045) 27px),
+    /* fine fibre grain */
+    repeating-linear-gradient(90deg,
+      rgba(70, 86, 70, .022) 0px, transparent 2px, transparent 4px),
+    /* aged blotches */
+    radial-gradient(560px 300px at 14% 4%, rgba(179, 144, 79, .10), transparent 60%),
+    radial-gradient(620px 380px at 88% 22%, rgba(166, 101, 77, .07), transparent 60%),
+    radial-gradient(800px 500px at 45% 105%, rgba(70, 86, 70, .10), transparent 65%),
+    linear-gradient(178deg, var(--paper) 0%, var(--paper-deep) 100%);
+  border: 1px solid rgba(70, 86, 70, .35);
+  outline: 1px solid rgba(244, 236, 218, .55);
+  outline-offset: -6px;
+  box-shadow:
+    0 2px 0 rgba(255, 252, 244, .35) inset,
+    0 30px 80px rgba(30, 40, 30, .45);
+}
+.band { position: relative; z-index: 2; flex-shrink: 0; }
+/* FIT STRATEGY: the page never scrolls. CSS clamps compact the
+   layout to the window; app.js then scales the whole sheet down
+   (transform: scale) if it still overflows, like viewing a poster
+   from further away. Text proportions are preserved. */
+
+/* ================= BAND 1 · HEADER (language switch) ================= */
+.band-head {
+  padding: calc(var(--fit) * 1.5) var(--pad) 0;
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+/* EN / ES language switch */
+.lang {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: clamp(.62rem, .85vh + .2vw, .74rem);
+  letter-spacing: .22em;
+}
+.lang-sep { color: rgba(46, 58, 48, .45); }
+.lang-btn {
+  background: none;
+  border: none;
+  padding: 2px 1px;
+  height: auto;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  color: rgba(46, 58, 48, .55);
+  -webkit-tap-highlight-color: transparent;
+}
+/* beat the global `button:hover { background: claret }` rule */
+.lang .lang-btn:hover, .lang .lang-btn:focus {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--pine);
+  outline: none;
+}
+.lang-btn.lang-active, .lang .lang-btn.lang-active { color: var(--pine); background: none; }
+.lang-active {
+  color: var(--pine);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+/* ================= BAND 2 · STACKED TITLE ================= */
+.band-title {
+  text-align: center;
+  padding: calc(var(--fit) * .6) clamp(18px, 5vw, 64px) 0;
+}
+.invite {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(.92rem, 1.9vh + .35vw, 1.3rem);
+  letter-spacing: .09em;
+  color: var(--soft);
+  margin-bottom: calc(var(--fit) * .35);
+}
+h1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 600;
+  /* sized from the PAPER's inner width, not the viewport: a line can
+     never wrap — not even with the fallback serif before the webfont
+     loads (that wrap-on-load was the page "jump") */
+  font-size: clamp(1.6rem, calc((var(--sheet-w) - 2 * var(--pad)) * .09), 4.4rem);
+  line-height: .92;               /* compact stack, per the sketch */
+  color: var(--ink);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+h1 .t-line { white-space: nowrap; }   /* every line stays on one line */
+h1 .edition {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--claret);
+}
+
+/* ================= BAND 3 · THE PRINT (centred, large) =================
+   the framed illustration sits in the middle of the square and takes
+   whatever room the other bands leave: as large as it fits, never
+   pushing the sheet out of shape. */
+.band-photo {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: calc(var(--fit) * .5) clamp(18px, 5vw, 64px);
+}
+/* the pending dates, promoted: big claret serif between gold rules */
+.dates-note {
+  margin-top: calc(var(--fit) * .9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 20px);
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(1.05rem, 2.3vh + .5vw, 1.7rem);
+  letter-spacing: .08em;
+  color: var(--claret);
+  text-align: center;
+}
+.dates-note span:not(.dn-rule) {
+  white-space: nowrap;
+}
+.dates-note .dn-rule {
+  flex: 0 1 clamp(34px, 8vw, 90px);
+  min-width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.band-foot .dates-note {
+  margin: 0 0 calc(var(--fit) * .7);
+  color: var(--paper);
+}
+.band-foot .dates-note .dn-rule {
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hero img {
+  flex: 0 1 auto;
+  min-height: 0;
+  /* the print asks for a fixed share of the SHEET (38%): same size on
+     every window and language. If the text bands ever need more room,
+     max-height + flex-shrink give it back gracefully. */
+  height: min(clamp(200px, 56vh, 540px), calc(var(--sheet-h) * .38));
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border: 1px solid var(--gold-dim);
+  outline: 8px solid rgba(255, 252, 244, .8);
+  outline-offset: -5px;
+  box-shadow: 0 22px 50px rgba(46, 58, 48, .28);
+}
+.hero figcaption {
+  flex: 0 0 auto;
+  margin-top: calc(var(--fit) * .4);
+  font-style: italic;
+  font-size: clamp(.68rem, 1.05vh + .28vw, .9rem);
+  color: var(--soft);
+  letter-spacing: .06em;
+  text-align: center;
+}
+
+/* ================= BAND 4 · THE PROGRAMME =================
+   an editorial programme rather than four boxed cards: fine brass
+   rules, small engraved numerals and generous air. */
+.band-programme {
+  padding: calc(var(--fit) * .6) clamp(18px, 5vw, 64px);
+}
+.programme {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border: none;
+  background: none;
+  counter-reset: cell;
+}
+.cell {
+  position: relative;
+  counter-increment: cell;
+  padding: clamp(10px, 1.5vh, 18px) clamp(12px, 2vw, 30px);
+  text-align: center;
+  border: 0;
+  background: none;
+}
+/* desktop: the four columns are narrow, so keep their side padding
+   small — wide text columns mean fewer wraps and a bigger print */
+@media (min-width: 1000px) {
+  .cell { padding-left: clamp(6px, .9vw, 14px); padding-right: clamp(6px, .9vw, 14px); }
+}
+.cell::before {
+  content: "0" counter(cell);
+  display: block;
+  margin-bottom: clamp(2px, .35vh, 5px);
+  font-family: var(--sans);
+  font-size: clamp(.5rem, .68vh + .14vw, .6rem);
+  font-weight: 500;
+  letter-spacing: .4em;
+  text-indent: .4em;               /* keep the tracking visually centred */
+  color: var(--gold);
+}
+.cell h3 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(.98rem, 1.7vh + .35vw, 1.42rem);
+  color: var(--claret);
+  letter-spacing: .015em;
+}
+.cell h3::after {
+  content: "";
+  display: block;
+  width: clamp(20px, 3vw, 32px);
+  height: 1px;
+  margin: clamp(4px, .6vh, 7px) auto clamp(5px, .8vh, 8px);
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.cell p {
+  margin-top: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(.9rem, 1.15vh + .27vw, 1.1rem);
+  line-height: 1.5;
+  min-height: 4em;   /* reserve enough lines so EN/ES keep the photo the same size */
+  color: var(--ink);
+  opacity: .9;
+}
+/* hairline dividers instead of boxes (2-up portrait layout only) */
+@media (max-width: 999px) {
+  .cell:nth-child(even) { border-left: 1px solid var(--gold-dim); }
+  .cell:nth-child(n + 3) { border-top: 1px solid var(--gold-dim); }
+}
+.cell .mail-link {
+  color: var(--claret);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.cell .mail-link:hover { color: var(--gold); }
+
+/* desktop: flatten the paper into a slightly landscape sheet (1.2 : 1)
+   and lay the four cells in a single row, so the print keeps the
+   vertical room it gains from the flatter paper */
+@media (min-width: 1000px) {
+  :root {
+    --sheet-w: min(calc((100dvw - clamp(16px, 5.2vw, 80px)) * .96),
+                   calc(var(--sheet-h) * 1.2));
+  }
+  .sheet { height: calc(var(--sheet-w) / 1.2); }
+  .programme { grid-template-columns: repeat(4, 1fr); }
+  .cell + .cell { border-left: 1px solid var(--gold-dim); }
+  .cell p { min-height: 6em; }   /* tall enough for the widest ES wrap, so EN/ES keep the photo the same size */
+}
+
+/* shorter desktop windows (common laptops): tighten the title and the
+   programme so the print keeps a fair share of the fixed sheet */
+@media (min-width: 1000px) and (max-height: 820px) {
+  h1 { font-size: clamp(1.6rem, calc((var(--sheet-w) - 2 * var(--pad)) * .076), 4.4rem); }
+  .invite { font-size: clamp(.85rem, 1.6vh + .3vw, 1.15rem); }
+  .cell p { font-size: clamp(.85rem, 1vh + .22vw, 1.05rem); min-height: 5.5em; }
+  .dates-note { font-size: clamp(1rem, 2vh + .4vw, 1.4rem); }
+  .band-foot { padding-top: calc(var(--fit) * .8); padding-bottom: calc(var(--fit) * .5); }
+}
+
+/* ================= BAND 5 · FOOT: the waitlist only ================= */
+.band-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--pine);
+  color: var(--paper);
+  padding: calc(var(--fit) * 1.1) var(--pad) calc(var(--fit) * .7);
+}
+.foot-form { width: 100%; max-width: 520px; text-align: center; }
+#waitlist-form {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+}
+input {
+  min-width: 0;
+  width: clamp(140px, 24vw, 230px);
+  background: transparent;
+  border: 1px solid rgba(244, 236, 218, .45);
+  outline: none;
+  font-family: var(--serif);
+  font-size: clamp(.85rem, 1.25vh + .3vw, 1rem);
+  color: var(--paper);
+  padding: 0 10px;
+  height: clamp(38px, 5vh, 46px);
+}
+input::placeholder { color: rgba(244, 236, 218, .5); font-style: italic; }
+/* the CTA framed in a box, exactly like the sketch's rectangle */
+button {
+  font-family: var(--sans);
+  font-size: clamp(.6rem, .85vh + .18vw, .7rem);
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--oxblood);
+  border: 1px solid var(--gold);
+  height: clamp(38px, 5vh, 46px);
+  padding: 0 clamp(14px, 2vw, 24px);
+  cursor: pointer;
+  transition: background .25s;
+  white-space: nowrap;
+}
+/* very narrow screens: compact the header and CTA */
+@media (max-width: 460px) {
+  .band-head { gap: 14px; padding-top: calc(var(--fit) * .9); }
+  .lang { font-size: .58rem; letter-spacing: .16em; gap: 4px; }
+  .join-cta { letter-spacing: .14em; }
+}
+button:focus-visible { outline: 1px solid rgba(244, 236, 218, .35); outline-offset: 4px; }
+button:hover { background: var(--claret); }
+.fine {
+  margin-top: calc(var(--fit) * .5);
+  font-family: var(--sans);
+  font-size: .66rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: rgba(244, 236, 218, .6);
+}
+.msg { margin-top: 10px; font-size: clamp(.85rem, 1.4vh + .25vw, 1rem); color: #e8c9a4; min-height: 1.3em; }
+.success .ok { font-size: clamp(1.05rem, 1.9vh + .4vw, 1.4rem); font-weight: 600; color: var(--paper); }
+.success .fine { margin-top: 8px; }
+
+/* ================= ADAPTIVE BREAKPOINTS ================= */
+/* phones: the paper goes portrait (the square is the desktop shape),
+   the foot band stacks and the print keeps a generous size */
+@media (max-width: 680px) {
+  .sheet {
+    width: min(560px, calc(100dvw - 16px));
+    height: auto;                    /* portrait sheet = content height */
+    aspect-ratio: auto;
+  }
+  /* phones: keep the letter on one screen — the whole sheet is scaled
+     to fit by app.js instead of letting the page scroll */
+  html, body { overflow: hidden; }
+  body { height: 100dvh; min-height: 0; }
+  .band-head { padding-top: calc(var(--fit) * 1.1); }
+  .hero img { height: clamp(110px, 22vh, 220px); }
+  .band-programme { padding-top: calc(var(--fit) * .9); padding-bottom: calc(var(--fit) * .9); }
+  .cell { padding: clamp(8px, 1.3vh, 14px) 0; }
+  /* phones: stack the four cells one under another (portrait scroll) */
+  .programme { grid-template-columns: 1fr; gap: 0; }
+  .cell:nth-child(even) { border-left: 0; }
+  .cell:nth-child(n + 3) { border-top: 0; }
+  .cell + .cell { border-top: 1px solid var(--gold-dim); }
+  .band-foot { padding-top: calc(var(--fit) * 1); }
+  .foot-form { max-width: 100%; }
+  #waitlist-form { flex-direction: column; align-items: stretch; gap: 8px; }
+  /* 16px: below that, iOS Safari zooms the whole page on focus */
+  input { width: 100%; font-size: 16px; border-bottom: 1px solid rgba(244, 236, 218, .7); }
+  button { padding: 12px; }
+}
+
+/* short windows (small laptops, tightened heights):
+   shed the heaviest blocks so the form stays on-screen */
+@media (max-height: 640px) {
+  .hero img { height: clamp(120px, 28vh, 260px); }
+  .hero figcaption { display: none; }
+}
+@media (max-height: 560px) {
+  h1 { font-size: clamp(1.6rem, 7.4vh, 2.6rem); }
+  .hero img { height: clamp(100px, 26vh, 200px); }
+}
+
+/* phones in landscape */
+@media (max-height: 460px) and (orientation: landscape) {
+  .band-head { padding-top: calc(var(--fit) * .7); }
+  .hero img { height: clamp(90px, 24vh, 170px); }
+}
+
+/* ================= THE APPLICATION MODAL =================
+   a second letter that drops over the first: same paper, same rules.
+   Fixed to the viewport so the sheet's scale transform never touches it. */
+.join-cta {
+  font-size: clamp(.7rem, 1vh + .22vw, .82rem);
+  padding: 1.15em clamp(18px, 4.5vw, 40px);
+  height: auto;
+  white-space: normal;
+  line-height: 1.4;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 3vh, 32px);
+}
+.modal[hidden] { display: none; }
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 40, 30, .55);
+  backdrop-filter: blur(3px);
+}
+.modal-card {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(88dvh, 92svh, 100%);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(20px, 4vh, 40px) clamp(18px, 4.5vw, 44px);
+  background:
+    repeating-linear-gradient(0deg,
+      transparent 0px, transparent 26px,
+      rgba(70, 86, 70, .045) 26px, rgba(70, 86, 70, .045) 27px),
+    linear-gradient(178deg, var(--paper) 0%, var(--paper-deep) 100%);
+  color: var(--ink);
+  border: 1px solid rgba(70, 86, 70, .35);
+  outline: 1px solid rgba(244, 236, 218, .55);
+  outline-offset: -6px;
+  box-shadow: 0 30px 80px rgba(30, 40, 30, .45);
+  animation: drop .35s ease-out;
+}
+@keyframes drop {
+  from { transform: translateY(-24px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+.modal-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  width: 34px; height: 34px;
+  padding: 0;
+  font-family: var(--sans);
+  font-size: 1.25rem;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--pine);
+}
+.modal-close:hover { background: transparent; color: var(--claret); }
+#form-title {
+  font-weight: 600;
+  font-size: clamp(1.3rem, 2.6vh + .5vw, 1.9rem);
+  text-align: center;
+  margin-bottom: calc(var(--fit) * .9);
+  color: var(--ink);
+}
+#waitlist-form { display: block; margin-top: calc(var(--fit) * 1.1); }
+/* honeypot: off-screen, never focusable — bots fill it, people don't */
+.hp {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.field { display: block; margin-bottom: 14px; }
+.field-row { display: flex; gap: 14px; }
+.field-row .field { flex: 1 1 auto; min-width: 0; }
+.field-row .field-sm { flex: 0 0 90px; }
+.label .opt {
+  font-style: italic;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: .02em;
+  color: rgba(46, 58, 48, .75);
+  font-size: .95em;
+  margin-left: 5px;
+}
+.label {
+  display: block;
+  font-family: var(--sans);
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--pine);
+  margin-bottom: 5px;
+}
+fieldset.field { border: none; padding: 0; min-inline-size: 0; }
+/* inputs on paper: ink, not the foot band's cream */
+.modal-card input[type="text"],
+.modal-card input[type="email"],
+.modal-card input[type="url"],
+.modal-card input[type="number"],
+.modal-card textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  background: rgba(255, 252, 244, .6);
+  border: 1px solid rgba(70, 86, 70, .35);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;                   /* no iOS zoom on focus */
+  padding: 9px 12px;
+  height: auto;
+}
+.modal-card textarea { resize: vertical; min-height: 64px; }
+.modal-card input::placeholder,
+.modal-card textarea::placeholder { color: rgba(46, 58, 48, .4); font-style: italic; }
+/* age: numeric keypad on phones, but no spinner arrows */
+#f-age::-webkit-outer-spin-button,
+#f-age::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#f-age { -moz-appearance: textfield; appearance: textfield; }
+.modal-card input:focus, .modal-card textarea:focus {
+  border-color: var(--claret);
+  outline: 1px solid var(--gold-dim);
+}
+/* ski & snow: five paper tiles */
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+.radio-wide { grid-column: 1 / -1; }
+.radio {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(70, 86, 70, .3);
+  background: rgba(255, 252, 244, .5);
+  cursor: pointer;
+  font-size: .95rem;
+}
+.radio > span { flex: 1 1 auto; min-width: 0; overflow-wrap: break-word; }
+.radio input[type="radio"] {
+  margin-top: 4px;
+  width: auto; height: auto;
+  border: none; background: transparent; padding: 0;
+  accent-color: var(--oxblood); flex-shrink: 0;
+}
+.radio b { font-weight: 600; }
+.radio i {
+  display: block;
+  font-style: italic;
+  font-size: .78rem;
+  line-height: 1.3;
+  color: var(--soft);
+}
+.radio:has(input:checked) {
+  border-color: var(--claret);
+  background: rgba(166, 101, 77, .12);
+}
+/* role: five paper chips, one tap each */
+.chip-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip { position: relative; cursor: pointer; }
+.chip input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: auto; height: auto;
+  border: none; background: transparent; padding: 0;
+}
+.chip span {
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid rgba(70, 86, 70, .3);
+  background: rgba(255, 252, 244, .5);
+  font-family: var(--serif);
+  font-size: .88rem;
+  line-height: 1.2;
+}
+.chip input[type="radio"]:checked + span {
+  border-color: var(--claret);
+  background: rgba(166, 101, 77, .12);
+}
+.chip input[type="radio"]:focus-visible + span {
+  outline: 1px solid var(--gold-dim);
+  outline-offset: 1px;
+}
+/* the free-text role field, only when "Other" is picked */
+.role-other { margin-top: 8px; }
+.role-other[hidden] { display: none; }
+/* GDPR consent */
+.rgpd {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px dashed var(--gold-dim);
+  background: rgba(255, 252, 244, .45);
+}
+.rgpd input[type="checkbox"] {
+  margin-top: 5px;
+  width: auto; height: auto;
+  border: none; background: transparent; padding: 0;
+  accent-color: var(--oxblood); flex-shrink: 0;
+}
+.rgpd span { font-size: .85rem; line-height: 1.45; color: var(--ink); opacity: .85; }
+.rgpd a { color: var(--claret); }
+.privacy-note p {
+  margin: -6px 0 12px;
+  padding: 10px 12px;
+  font-size: .8rem;
+  line-height: 1.5;
+  background: rgba(255, 252, 244, .55);
+  border-left: 2px solid var(--claret);
+  color: var(--navy);
+}
+#waitlist-form .msg { color: var(--oxblood); text-align: center; }
+.submit-btn {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  color: var(--paper);
+  outline-color: rgba(70, 86, 70, .25);
+}
+.modal-card .success { text-align: center; padding: 20px 0; }
+.modal-card .success .ok {
+  color: var(--ink);
+  font-size: clamp(1.45rem, 2.8vh + .5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+.modal-card .success .fine {
+  color: var(--ink);
+  margin-top: 14px;
+  font-family: var(--sans);
+  font-size: clamp(1rem, 1.8vh + .32vw, 1.2rem);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: .005em;
+  text-transform: none;
+  opacity: .92;
+  max-width: 46ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.success .letter-crest {
+  display: block;
+  width: clamp(64px, 10vh, 96px);
+  height: auto;
+  margin: clamp(16px, 2.6vh, 28px) auto 0;
+  color: var(--gold);
+  opacity: .95;
+}
+
+/* phones: the modal keeps its own scroll; lock the page behind it */
+@media (max-width: 680px) {
+  .radio-grid { grid-template-columns: 1fr; }
+  /* thumb-sized tap targets: chips and close button clear 44px */
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+  .modal-close { width: 44px; height: 44px; top: 6px; right: 6px; }
+  .modal-card input, .modal-card textarea { caret-color: var(--claret); }
+}
+body.modal-open { overflow: hidden; }
+
+/* desktop: pack the application into one screen — no internal scroll */
+@media (min-width: 681px) {
+  .modal-card {
+    width: min(620px, 100%);
+    padding: clamp(16px, 2.4vh, 26px) clamp(20px, 3.6vw, 34px);
+    max-height: min(92dvh, 94svh, 100%);
+  }
+  #form-title {
+    font-size: clamp(1.2rem, 2.2vh + .4vw, 1.6rem);
+    margin-bottom: calc(var(--fit) * .5);
+  }
+  #waitlist-form { margin-top: calc(var(--fit) * .5); }
+  .field { margin-bottom: 9px; }
+  .label { margin-bottom: 3px; }
+  .modal-card input[type="text"],
+  .modal-card input[type="email"],
+  .modal-card input[type="url"],
+  .modal-card input[type="number"],
+  .modal-card textarea { padding: 6px 10px; }
+  .modal-card textarea { min-height: 46px; }
+  .radio-grid { gap: 6px; margin-top: 2px; }
+  .radio { padding: 6px 9px; }
+  .radio i { font-size: .72rem; line-height: 1.2; }
+  .chip-grid { gap: 5px; margin-top: 2px; }
+  .chip span { padding: 4px 10px; font-size: .84rem; }
+  .rgpd { margin-top: 9px; padding: 8px 10px; }
+  .rgpd span { font-size: .8rem; line-height: 1.35; }
+  .submit-btn { margin-top: 2px; }
+}
+
+/* shorter desktop windows: tighten a bit more so the submit stays visible */
+@media (min-width: 681px) and (max-height: 760px) {
+  .modal-card { padding: 12px clamp(20px, 3.6vw, 32px); }
+  #form-title { font-size: clamp(1.1rem, 2.2vh + .3vw, 1.35rem); margin-bottom: calc(var(--fit) * .3); }
+  #waitlist-form { margin-top: calc(var(--fit) * .35); }
+  .field { margin-bottom: 7px; }
+  .modal-card input[type="text"],
+  .modal-card input[type="email"],
+  .modal-card input[type="url"],
+  .modal-card input[type="number"],
+  .modal-card textarea { padding: 5px 9px; }
+  .modal-card textarea { min-height: 40px; }
+  .radio-grid { gap: 5px; }
+  .radio { padding: 5px 8px; }
+  .chip span { padding: 3px 9px; font-size: .8rem; }
+  .rgpd { margin-top: 7px; padding: 6px 9px; }
+  .rgpd span { font-size: .76rem; line-height: 1.3; }
+}
+
+/* last-resort guard: if content still exceeds a tiny window,
+   the sheet scrolls internally instead of breaking the layout */
+@media (max-height: 420px) {
+  html, body { overflow: auto; }
+  body { height: auto; min-height: 100dvh; }
+  .sheet { height: auto; max-height: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

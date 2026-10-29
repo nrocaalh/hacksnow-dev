@@ -1,0 +1,20 @@
+# Cloudflare Pages + D1 config.
+# Deploy:   wrangler pages deploy . --project-name=<PAGES_PROJECT>
+# Bind D1 (first time, or set the bindings in the Pages dashboard):
+#   wrangler d1 create hacker-house-db          -> copy the database_id below
+#   wrangler d1 migrations apply hacker-house-db --remote
+# Secrets (never commit these):
+#   wrangler pages secret put RESEND_API_KEY --project-name=<PAGES_PROJECT>
+name = "hacker-house-snow"
+compatibility_date = "2026-06-01"
+pages_build_output_dir = "."   # this repo is already static — no build step
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hacker-house-db"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"   # create your own D1 and paste its id
+
+[vars]
+MAIL_FROM = "Hacker House <contact@hacksnow.dev>"
+MAIL_REPLY_TO = "contact@hacksnow.dev"
+NOTIFY_EMAIL = "contact@hacksnow.dev"   # one summary email per signup
